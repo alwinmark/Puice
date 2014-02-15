@@ -1,0 +1,16 @@
+{
+    "require": {
+    },
+    "require-dev": {
+        "behat/behat": "2.4.*@stable",
+        "behat/mink-extension": "*",
+        "behat/mink-selenium2-driver": "*",
+        "behat/mink-goutte-driver": "*",
+        "phpspec/phpspec": "2.0.*@dev"
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "bin-dir": "vendor/bin/"
+    },
+    "autoload": {"psr-0": {"": "src"}}
+}
