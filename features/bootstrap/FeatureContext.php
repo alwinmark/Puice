@@ -11,7 +11,7 @@ use Behat\Gherkin\Node\PyStringNode,
 // Require 3rd-party libraries here:
 //
 //   require_once 'PHPUnit/Autoload.php';
-//   require_once 'PHPUnit/Framework/Assert/Functions.php';
+   require_once 'PHPUnit/Framework/Assert/Functions.php';
 //
 
 /**
@@ -103,10 +103,14 @@ class FeatureContext extends BehatContext
     /**
      * @Then /^there should be the \'([^\']*)\' injected with value \'([^\']*)\'$/
      */
-    public function thereShouldBeTheInjectedWithValue($arg1, $arg2)
+    public function thereShouldBeTheInjectedWithValue($name, $value)
     {
         $this->createConcreteEntrypoint();
-        throw new PendingException();
+//        $createCallable = array($this->entryPointName, 'create');
+//        $object = call_user_func($createCallable);
+        $clazz = $this->entryPointName;
+        $object = $clazz::create();
+        assertEquals($value, $object->$name);
     }
 
     /**
@@ -142,7 +146,6 @@ class FeatureContext extends BehatContext
             "  {}\n" .
             "}";
 
-        echo $classDefinition;
         eval($classDefinition);
         $this->classCreated = true;
     }
