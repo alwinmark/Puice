@@ -26,17 +26,17 @@ class Factory
         $arguments = array();
 
         foreach ($constructorParameters as $parameter) {
-            $type = null;
+            $systemType = null;
             $name = $parameter->name;
             $isOptional = $parameter->isOptional();
 
-            try {
-                $type = @$parameter->getClass()->name; 
-            } catch(\ReflectionException $e) {
-                $type = $this->mapType($name, 'string');
+            if (! is_null($typeClass = @$parameter->getClass())) {
+                $systemType = $typeClass->name;
+            } else {
+                $systemType = 'string';
             }
 
-            $type = $this->mapType($type);
+            $type = $this->mapType($systemType);
             $arguments[] = $this->getDependency($type, $name, $isOptional);
         }
 
@@ -57,6 +57,6 @@ class Factory
 
     public function mapType($systemType)
     {
-        return 'string';
+        return $systemType;
     }
 }

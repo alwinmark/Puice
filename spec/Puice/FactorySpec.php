@@ -59,4 +59,16 @@ class FactorySpec extends ObjectBehavior
         $subject->str1->shouldEqual('Everything');
         $subject->str2->shouldEqual('Ok');
     }
+
+    function it_creates_instance_of_itself(Config $config)
+    {
+        $className = 'Puice\Factory';
+        $config->get('Puice\Config', 'config')->willReturn($config);
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
+
+        $subject = $this->create($className)->shouldHaveType($className);
+    }
+
 }
