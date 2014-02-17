@@ -43,7 +43,7 @@ class Factory
         return $reflection->newInstanceArgs($arguments);
     }
 
-    public function getDependency($type, $name, $isOptional = false)
+    private function getDependency($type, $name, $isOptional = false)
     {
         $dependency = $this->config->get($type, $name);
         if ($dependency != null || $isOptional) {
@@ -55,7 +55,7 @@ class Factory
         );
     }
 
-    public function mapType($systemType)
+    protected function mapType($systemType)
     {
         return $systemType;
     }
