@@ -15,26 +15,26 @@ class Puice implements Puice\Config {
         require_once $_SERVER['PUICE_CONFIG'];
     }
 
-    public function get($typeKey, $name) {
-        if (isset(self::$configurations[$name]) &&
-            isset(self::$configurations[$name][$typeKey])) {
-            return self::$configurations[$name][$typeKey];
+    public function get($type, $name) {
+        if (isset(self::$configurations[$type]) &&
+            isset(self::$configurations[$type][$name])) {
+            return self::$configurations[$type][$name];
         }
 
         return null;
     }
 
-    public function set($name, $value, $type)
+    public function set($type, $name, $value)
     {
-        if (!array_key_exists($name, self::$configurations)) {
-            self::$configurations[$name] = array();
+        if (!array_key_exists($type, self::$configurations)) {
+            self::$configurations[$type] = array();
         }
 
-        if (array_key_exists($type, self::$configurations[$name])) {
+        if (array_key_exists($name, self::$configurations[$type])) {
             throw new Exception('Duplicate definition of one Dependency');
         }
 
-        self::$configurations[$name][$type] = $value;
+        self::$configurations[$type][$name] = $value;
     }
 }
 
