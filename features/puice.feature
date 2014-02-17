@@ -3,13 +3,25 @@ Feature: Puice
     As a new cool Php Application
     I want to have a Framework which take care about these things without a huge overhead and a clear Entrypoint
 
-    Scenario: Puice does not find the Configuration File
+    Scenario: Puice injects Entrypoint with String Dependency(Configuration)
         Given the Environment variable PUICE_CONFIG is set to '/tmp/puice_test.inc.php'
-        When my Entrypoint extends the Abstract Class Puice\Entrypoint
-        Then a 'ConfigFileNotFound' Exception should be thrown
+        And there is a file '/tmp/puice_test.inc.php' with:
+            """
+            Puice::configureApplication(function($config) {
+                $config->set('foo', 'bar', 'string');
+            });
+            """
+        And I have a Class:
+            """
+            class %some_class% extends Puice\Entrypoint
+            {
+                public $foo = null;
 
-    Scenario: Puice find and reads the root Configuration File, given by the Environment Variable
-        Given there is a configfile '/tmp/puice_test.inc.php'
-        Given the Environment variable PUICE_CONFIG is set to '/tmp/puice_test.inc.php'
-        When my Entrypoint extends the Abstract Class Puice\Entrypoint
-        Then there should be no Exceptions
+                public function __construct($foo)
+                {
+                    $this->foo = $foo;
+                }
+            }
+            """
+        When I call create on this class
+        Then I should get 'bar' for the Property 'foo'

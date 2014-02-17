@@ -2,12 +2,10 @@
 
 namespace Puice;
 
-use Puice\Type;
-
 interface Config {
 
-    public function get($typeKey, $name);
+    public function get($type, $name);
 
-    public function set(Type $dependency);
+    public function set($name, $value, $type);
 
 }

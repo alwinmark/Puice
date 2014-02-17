@@ -10,7 +10,7 @@ use Behat\Gherkin\Node\PyStringNode,
 //
 // Require 3rd-party libraries here:
 //
-//   require_once 'PHPUnit/Autoload.php';
+   require_once 'PHPUnit/Autoload.php';
    require_once 'PHPUnit/Framework/Assert/Functions.php';
 //
 
@@ -20,12 +20,9 @@ use Behat\Gherkin\Node\PyStringNode,
 class FeatureContext extends BehatContext
 {
     protected $cleanUpCallbacks = array();
-    protected $entryPointName= null;
-    protected $entryPointParentClass= null;
-    protected $entryPointAttributes = array();
-    protected $entryPointConstructorParameters = array();
-    private   $classCreated = false;
 
+    protected $generatedClass = null;
+    protected $subject = null;
 
     /**
      * Initializes context.
@@ -49,24 +46,18 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @Given /^there is a configfile \'([^\']*)\'$/
+     * @Given /^there is a file \'([^\']*)\' with:$/
      */
-    public function thereIsAConfigfile($filename)
+    public function thereIsAFileWith($filename, PyStringNode $string)
     {
         touch($filename);
         $this->cleanUpCallbacks[] = function() use ($filename) {
             unlink($filename);
         };
+
+        file_put_contents($filename, "<?php\n$string", FILE_APPEND);
     }
 
-    /**
-     * @Given /^the configfile \'([^\']*)\' has attribute \'([^\']*)\' with value \'([^\']*)\'$/
-     */
-    public function theConfigfileHasAttributeWithValue(
-        $filename, $attribute, $value
-    ) {
-        file_put_contents($filename, "attribute: $value\n", FILE_APPEND);
-    }
 
     /**
      * @Given /^the Environment variable PUICE_CONFIG is set to \'([^\']*)\'$/
@@ -77,77 +68,37 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @When /^my Entrypoint extends the Abstract Class Puice\\Entrypoint$/
+     * @Given /^I have a Class:$/
      */
-    public function myEntrypointExtendsTheAbstractClassPuiceEntrypoint()
+    public function iHaveAClass(PyStringNode $string)
     {
-        $this->entryPointName = 'TestEntryPoint' .
-            intval(microtime(true) * 1000);
-        $this->entryPointParentClass = 'Puice\Entrypoint';
-    }
-
-    /**
-     * @Given /^my Entrypoint needs following Arguments in the Constructor \'([^\']*)\'$/
-     */
-    public function myEntrypointNeedsFollowingArgumentsInTheConstructor($arg1)
-    {
-        $dependencies = explode(', ', $arg1);
-        foreach ($dependencies as $dependency) {
-            $type_name = explode(': ', $dependency);
-            $this->entryPointAttributes[] = "public \$$type_name[1] = null;";
-            $this->entryPointConstructorParameters[] =
-                "{$type_name[0]} \${$type_name[1]}";
-        }
-    }
-
-    /**
-     * @Then /^there should be the \'([^\']*)\' injected with value \'([^\']*)\'$/
-     */
-    public function thereShouldBeTheInjectedWithValue($name, $value)
-    {
-        $this->createConcreteEntrypoint();
-//        $createCallable = array($this->entryPointName, 'create');
-//        $object = call_user_func($createCallable);
-        $clazz = $this->entryPointName;
-        $object = $clazz::create();
-        assertEquals($value, $object->$name);
-    }
-
-    /**
-     * @Then /^a \'([^\']*)\' Exception should be thrown$/
-     */
-    public function aExceptionShouldBeThrown($arg1)
-    {
-        $this->createConcreteEntrypoint();
-        throw new PendingException();
-    }
-
-    /**
-     * @Then /^there should be no Exceptions$/
-     */
-    public function thereShouldBeNoExceptions()
-    {
-        $this->createConcreteEntrypoint();
-        throw new PendingException();
-    }
-
-    protected function createConcreteEntrypoint()
-    {
-        if ($this->classCreated) {
-            return;
-        }
-
-        $constructorArgumentString = implode(", ", $this->entryPointConstructorParameters);
-        $classDefinition = "".
-            "class {$this->entryPointName} extends {$this->entryPointParentClass}\n" .
-            "{\n" .
-            implode("\n", $this->entryPointAttributes) .
-            "  function __construct($constructorArgumentString)\n" .
-            "  {}\n" .
-            "}";
+        $timeStamp = intval(microtime(true) * 1000);
+        $className = "TestClass$timeStamp";
+        $classDefinition = \str_replace(
+            '%some_class%',
+            $className,
+            $string
+        );
 
         eval($classDefinition);
-        $this->classCreated = true;
+        $this->generatedClass = $className;
+    }
+
+    /**
+     * @When /^I call create on this class$/
+     */
+    public function iCallCreateOnThisClass()
+    {
+        $clazz = $this->generatedClass;
+        $this->subject = $clazz::create();
+    }
+
+    /**
+     * @Then /^I should get \'([^\']*)\' for the Property \'([^\']*)\'$/
+     */
+    public function iShouldGetForTheProperty($value, $property)
+    {
+        assertEquals($value, $this->subject->$property);
     }
 
 }
