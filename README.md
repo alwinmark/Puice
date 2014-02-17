@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CansaSCityShuffle/Puice.png?branch=master)](https://travis-ci.org/CansaSCityShuffle/Puice)
+
 Puice
 =====
 
