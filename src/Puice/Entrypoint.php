@@ -2,12 +2,16 @@
 
 namespace Puice;
 
+use Puice;
+use Puice\Factory;
+
 class Entrypoint
 {
 
     public static function create()
     {
         $clazz = get_called_class();
-        return new $clazz();
+        $factory = new Factory(new Puice());
+        return $factory->create($clazz);
     }
 }
