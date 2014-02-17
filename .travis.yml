@@ -8,5 +8,5 @@ before_script:
   - composer install --prefer-source
 
 script:
-  - ./vendor/bin/phpspec run --no-interaction
+  - ./vendor/bin/phpspec --no-interaction -vvv --format=pretty run
   - ./vendor/bin/behat --format=pretty
