@@ -15,10 +15,20 @@ class Puice implements Puice\Config {
         require_once $_SERVER['PUICE_CONFIG'];
     }
 
+    public static function reset()
+    {
+        self::$configurations = array();
+    }
+
     public function get($type, $name) {
-        if (isset(self::$configurations[$type]) &&
-            isset(self::$configurations[$type][$name])) {
-            return self::$configurations[$type][$name];
+        if (isset(self::$configurations[$type])) {
+            if (isset(self::$configurations[$type][$name])) {
+                return self::$configurations[$type][$name];
+            } else
+            // if only one configuration exist autochoose
+            if (count(self::$configurations[$type]) == 1){
+                return array_pop(self::$configurations[$type]);
+            }
         }
 
         return null;

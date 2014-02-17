@@ -21,7 +21,7 @@ class FeatureContext extends BehatContext
 {
     protected $cleanUpCallbacks = array();
 
-    protected $generatedClass = null;
+    protected $injectTargetClass = null;
     protected $subject = null;
 
     /**
@@ -50,6 +50,10 @@ class FeatureContext extends BehatContext
      */
     public function thereIsAFileWith($filename, PyStringNode $string)
     {
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+
         touch($filename);
         $this->cleanUpCallbacks[] = function() use ($filename) {
             unlink($filename);
@@ -65,6 +69,9 @@ class FeatureContext extends BehatContext
     public function theEnvironmentVariablePuiceConfigIsSetTo($configPath)
     {
         $_SERVER['PUICE_CONFIG'] = $configPath;
+        $this->cleanUpCallbacks[] = function() {
+            Puice::reset();
+        };
     }
 
     /**
@@ -81,7 +88,7 @@ class FeatureContext extends BehatContext
         );
 
         eval($classDefinition);
-        $this->generatedClass = $className;
+        $this->injectTargetClass = $className;
     }
 
     /**
@@ -89,7 +96,7 @@ class FeatureContext extends BehatContext
      */
     public function iCallCreateOnThisClass()
     {
-        $clazz = $this->generatedClass;
+        $clazz = $this->injectTargetClass;
         $this->subject = $clazz::create();
     }
 
@@ -99,6 +106,32 @@ class FeatureContext extends BehatContext
     public function iShouldGetForTheProperty($value, $property)
     {
         assertEquals($value, $this->subject->$property);
+    }
+
+    /**
+     * @Given /^my class to inject is "([^"]*)"$/
+     */
+    public function myClassToInjectIs($className)
+    {
+        $this->injectTargetClass = $className;
+    }
+
+    /**
+     * @When /^build an Instance of this Class with the Factory$/
+     */
+    public function buildAnInstanceOfThisClassWithTheFactory()
+    {
+        Puice::init();
+        $factory = new Puice\Factory(new Puice());
+        $this->subject = $factory->create($this->injectTargetClass);
+    }
+
+    /**
+     * @Then /^I should get an Instance$/
+     */
+    public function iShouldGetAnInstance()
+    {
+        assertEquals(true, $this->subject != null);
     }
 
 }
