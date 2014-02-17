@@ -8,7 +8,7 @@ Feature: Puice
         And there is a file '/tmp/puice_test.inc.php' with:
             """
             Puice::configureApplication(function($config) {
-                $config->set('foo', 'bar', 'string');
+                $config->set('string', 'foo', 'bar');
             });
             """
         And I have a Class:
