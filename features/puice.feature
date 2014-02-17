@@ -38,7 +38,7 @@ Feature: Puice
         When build an Instance of this Class with the Factory
         Then I should get an Instance
 
-    Scenario: Puice finds by type if only one Dependecy is configured
+    Scenario: Puice finds dependencies by type if there is only one for this type
         Given the Environment variable PUICE_CONFIG is set to '/tmp/puice_type_test.inc.php'
         And there is a file '/tmp/puice_type_test.inc.php' with:
             """
