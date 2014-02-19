@@ -42,8 +42,20 @@ class Puice implements Config
      */
     public static function configureApplication($callback)
     {
-        self::$_appConfig = new Puice\Config\DefaultConfig();
         $callback(self::$_appConfig);
+    }
+
+    /**
+     * Initializes Puice
+     * This function initializes Puice, but is not mandatory as
+     * every function, that needs an initialized Puice already calls this
+     * function
+     */
+    public static function init()
+    {
+        if (self::$_appConfig == null) {
+            self::$_appConfig = new Puice\Config\DefaultConfig();
+        }
     }
 
     /**
@@ -87,6 +99,8 @@ class Puice implements Config
      */
     public function set($type, $name, $value)
     {
+        self::init();
+
         self::$_appConfig->set($type, $name, $value);
     }
 
