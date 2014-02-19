@@ -11,7 +11,7 @@
  * @link       https://github.com/CansaSCityShuffle/Puice
  */
 
-use Puice\Type;
+use Puice\Config;
 
 /**
  * Package Main class
@@ -24,10 +24,10 @@ use Puice\Type;
  * @package    Puice
  * @copyright  Copyright (c) 2014 Alwin Mark
  */
-class Puice implements Puice\Config
+class Puice implements Config
 {
 
-    private static $_configurations = array();
+    private static $_appConfig = null;
 
     /**
      * Static method used by the config.inc.php Files to set Dependencies
@@ -42,28 +42,16 @@ class Puice implements Puice\Config
      */
     public static function configureApplication($callback)
     {
-        $callback(new Puice());
+        self::$_appConfig = new Puice\Config\DefaultConfig();
+        $callback(self::$_appConfig);
     }
 
     /**
-     * This function will be automaticaly be called while
-     * interpreting this Class file.
-     *
-     * It should be obvious, but you should have allready defined the
-     * Environment variable PUICE_CONFIG before starting an Application
-     * that uses Puice
+     * Resets all previous defined Application configurations
      */
-    public static function init()
+    public static function resetApplicationConfig()
     {
-        require_once $_SERVER['PUICE_CONFIG'];
-    }
-
-    /**
-     * Resets all previous defined configurations
-     */
-    public static function reset()
-    {
-        self::$_configurations = array();
+        self::$_appConfig->reset();
     }
 
     /**
@@ -73,28 +61,22 @@ class Puice implements Puice\Config
      *
      * @param string $type currently only ClassNames with Namespaces are
      *                     supported
-     * @param string $name name of the Dependency, which also should match
-     *                     the constructor name
+     * @param string $name (optional) name of the Dependency. Default is
+     *                     'default'
      *
      * @return mixed predefined Dependency
      */
-    public function get($type, $name)
+    public function get($type, $name = 'default')
     {
-        if (isset(self::$_configurations[$type])) {
-            if (isset(self::$_configurations[$type][$name])) {
-                return self::$_configurations[$type][$name];
-            } else
-            // if only one configuration exist autochoose
-            if (count(self::$_configurations[$type]) == 1) {
-                return array_pop(self::$_configurations[$type]);
-            }
+        if (self::$_appConfig == null) {
+            return null;
         }
 
-        return null;
+        return $dependency = self::$_appConfig->get($type, $name);
     }
 
     /**
-     * Sets a Dependency with the specified type, name and value.
+     * Sets an EntryPoint Dependency with the specified type, name and value.
      * Please make sure, that you call this Method only in (the) config
      * script(s).
      *
@@ -105,16 +87,33 @@ class Puice implements Puice\Config
      */
     public function set($type, $name, $value)
     {
-        if (!array_key_exists($type, self::$_configurations)) {
-            self::$_configurations[$type] = array();
-        }
+        self::$_appConfig->set($type, $name, $value);
+    }
 
-        if (array_key_exists($name, self::$_configurations[$type])) {
-            throw new Exception('Duplicate definition of one Dependency');
-        }
+    /**
+     * Bulk sets Dependencies for a given array with two levels:
+     * @example
+     *    array(
+     *      'Puice\Config' => array(
+     *        'appConfig' => new MyConfig()
+     *      )
+     *    );
+     *
+     * @param array $configs bulk of dependency definitions like the
+     *                       example above
+     */
+    public function bulkSet(array $configs)
+    {
+        foreach ($configs as $type => $typeConfigs) {
+            if (! is_array($typeConfigs)) {
+                throw new \InvalidArgumentException(
+                    "Given configs for type: $type, must be an array itself"
+                );
+            }
 
-        self::$_configurations[$type][$name] = $value;
+            foreach ($typeConfigs as $name => $value) {
+                self::$_appConfig->set($type, $name, $value);
+            }
+        }
     }
 }
-
-Puice::init();

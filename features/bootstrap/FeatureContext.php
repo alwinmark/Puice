@@ -70,7 +70,7 @@ class FeatureContext extends BehatContext
     {
         $_SERVER['PUICE_CONFIG'] = $configPath;
         $this->cleanUpCallbacks[] = function() {
-            Puice::reset();
+            Puice::resetApplicationConfig();
         };
     }
 
@@ -121,7 +121,6 @@ class FeatureContext extends BehatContext
      */
     public function buildAnInstanceOfThisClassWithTheFactory()
     {
-        Puice::init();
         $factory = new Puice\Factory(new Puice());
         $this->subject = $factory->create($this->injectTargetClass);
     }

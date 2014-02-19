@@ -38,8 +38,20 @@ class Entrypoint
      */
     public static function create()
     {
+        include self::getServerConf();
         $clazz = get_called_class();
         $factory = new Factory(new Puice());
         return $factory->create($clazz);
+    }
+
+    /**
+     * Overwriteable Function to costom define the Root Application
+     * Config file for Puice
+     *
+     * @return string Path of the root Application Puice Configfile
+     */
+    protected static function getServerConf()
+    {
+        return $_SERVER['PUICE_CONFIG'];
     }
 }

@@ -60,17 +60,19 @@ class Factory
      * This is the method doing the magic. You can create every Instance
      * with it, as long as the Dependencies were allready defined.
      *
-     * @param string $className $Namespace.$Classname
+     * @param string $classType Type of the Dependency as $Namespace.$Classname
+     * @param string $name Name of the Dpenedency
      *
      * @throws \Exception if some required dependencies could not be found.
      */
-    public function create($className)
+    public function create($classType, $className = 'default')
     {
-        $reflection = new \ReflectionClass($className);
+        $clazz = $this->getDependency($classType, $className, true);
+        $reflection = new \ReflectionClass($classType);
         $constructorReflection = $reflection->getConstructor();
 
         if ($constructorReflection == null) {
-            return new $className();
+            return new $classType();
         }
 
         $constructorParameters = $constructorReflection->getParameters();
@@ -111,14 +113,12 @@ class Factory
 
         // and if that does not work, try the Default Prefix
         $defaultDependency = preg_replace('/(.*\\\\)(\w+)/i','\1\2\Default\2', $type);
-        echo $defaultDependency;
         if (class_exists($defaultDependency)) {
             return $this->create($defaultDependency);
         }
 
         throw new \Exception(
-            "Couldn't find Dependency for type: $type and name: $name" .
-            $defaultDependency
+            "Couldn't find Dependency for type: $type and name: $name"
         );
     }
 

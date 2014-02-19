@@ -51,6 +51,7 @@ class FactorySpec extends ObjectBehavior
         ';
         eval($classDefinition);
 
+        $config->get($className, 'default')->willReturn(null);
         $config->get('string', 'str1')->willReturn('Everything');
         $config->get('string', 'str2')->willReturn('Ok');
 
@@ -63,6 +64,7 @@ class FactorySpec extends ObjectBehavior
     function it_creates_instance_of_itself(Config $config)
     {
         $className = 'Puice\Factory';
+        $config->get($className, 'default')->willReturn(null);
         $config->get('Puice\Config', 'config')->willReturn($config);
 
         $subject = $this->create($className);
@@ -96,6 +98,8 @@ class FactorySpec extends ObjectBehavior
         Config $config
     ) {
         $className = 'Puice\Factory';
+        $config->get($className, 'default')->willReturn(null);
+        $config->get('Puice\Config\DefaultConfig', 'default')->willReturn(null);
         $config->get('Puice\Config', 'config')->willReturn(null);
 
         $subject = $this->create($className);
