@@ -71,4 +71,35 @@ class FactorySpec extends ObjectBehavior
         $subject = $this->create($className)->shouldHaveType($className);
     }
 
+    function it_autocreates_instance_of_dependency_if_its_a_concrete_class(
+        Config $config
+    ) {
+        $className = "ClassWithConcreteClassAsDependency{$this->timeStamp}";
+        $classDefinition = "" .
+        "class $className" .
+        ' {
+            public $factory = null;
+            public function __construct(Puice\Factory $factory) {
+                $this->factory = $factory;
+            }
+
+          }
+        ';
+        eval($classDefinition);
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
+        $subject->factory->shouldHaveType('Puice\Factory');
+    }
+
+    function it_autcreates_instance_if_dependency_has_a_DefaultImplementation(
+        Config $config
+    ) {
+        $className = 'Puice\Factory';
+        $config->get('Puice\Config', 'config')->willReturn(null);
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
+    }
+
 }

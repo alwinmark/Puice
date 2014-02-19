@@ -104,8 +104,21 @@ class Factory
             return $dependency;
         }
 
+        // if it is a concrete Class, its a try worth to instantiate it
+        if (class_exists($type)) {
+            return $this->create($type);
+        }
+
+        // and if that does not work, try the Default Prefix
+        $defaultDependency = preg_replace('/(.*\\\\)(\w+)/i','\1\2\Default\2', $type);
+        echo $defaultDependency;
+        if (class_exists($defaultDependency)) {
+            return $this->create($defaultDependency);
+        }
+
         throw new \Exception(
-            "Couldn't find Dependency for type: $type and name: $name"
+            "Couldn't find Dependency for type: $type and name: $name" .
+            $defaultDependency
         );
     }
 
