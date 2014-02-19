@@ -44,12 +44,12 @@ class DefaultConfig implements Config
      *
      * @param string $type currently only ClassNames with Namespaces are
      *                     supported
-     * @param string $name name of the Dependency, which also should match
-     *                     the constructor name
+     * @param string $name (optional) name of the Dependency. Default is
+     *                     'default'
      *
      * @return mixed predefined Dependency
      */
-    public function get($type, $name)
+    public function get($type, $name = 'default')
     {
         if (isset($this->_configurations[$type])) {
             if (isset($this->_configurations[$type][$name])) {
