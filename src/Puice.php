@@ -42,6 +42,7 @@ class Puice implements Config
      */
     public static function configureApplication($callback)
     {
+        self::init();
         $callback(self::$_appConfig);
     }
 
