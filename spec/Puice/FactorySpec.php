@@ -51,6 +51,7 @@ class FactorySpec extends ObjectBehavior
         ';
         eval($classDefinition);
 
+        $config->get($className, 'default')->willReturn(null);
         $config->get('string', 'str1')->willReturn('Everything');
         $config->get('string', 'str2')->willReturn('Ok');
 
@@ -63,12 +64,46 @@ class FactorySpec extends ObjectBehavior
     function it_creates_instance_of_itself(Config $config)
     {
         $className = 'Puice\Factory';
+        $config->get($className, 'default')->willReturn(null);
         $config->get('Puice\Config', 'config')->willReturn($config);
 
         $subject = $this->create($className);
         $subject->shouldHaveType($className);
 
         $subject = $this->create($className)->shouldHaveType($className);
+    }
+
+    function it_autocreates_instance_of_dependency_if_its_a_concrete_class(
+        Config $config
+    ) {
+        $className = "ClassWithConcreteClassAsDependency{$this->timeStamp}";
+        $classDefinition = "" .
+        "class $className" .
+        ' {
+            public $factory = null;
+            public function __construct(Puice\Factory $factory) {
+                $this->factory = $factory;
+            }
+
+          }
+        ';
+        eval($classDefinition);
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
+        $subject->factory->shouldHaveType('Puice\Factory');
+    }
+
+    function it_autcreates_instance_if_dependency_has_a_DefaultImplementation(
+        Config $config
+    ) {
+        $className = 'Puice\Factory';
+        $config->get($className, 'default')->willReturn(null);
+        $config->get('Puice\Config\DefaultConfig', 'default')->willReturn(null);
+        $config->get('Puice\Config', 'config')->willReturn(null);
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
     }
 
 }

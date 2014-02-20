@@ -11,7 +11,7 @@
  * @link       https://github.com/CansaSCityShuffle/Puice
  */
 
-use Puice\Type;
+use Puice\Config;
 
 /**
  * Package Main class
@@ -24,46 +24,26 @@ use Puice\Type;
  * @package    Puice
  * @copyright  Copyright (c) 2014 Alwin Mark
  */
-class Puice implements Puice\Config
+class Puice implements Config
 {
 
-    private static $_configurations = array();
+    private $_appConfig = null;
+    private $_entrypointConfig = null;
+    private $_factory = null;
+
 
     /**
-     * Static method used by the config.inc.php Files to set Dependencies
-     * outside of the implementation.
-     * @see
-     * https://github.com/CansaSCityShuffle/Puice/blob/master/features/puice.feature
-     * as an Example
+     * constructs the wonderfull Puice object with two levels of
+     * Configurations.
      *
-     * @param callable $callback callback which will be called with the
-     *                           Application Config Object.
-     *
+     * @param Puice\Config $appConfig application Level Dependencies
+     * @param Puice\Config $entrypointConfig entrypoint Level Dependencies
      */
-    public static function configureApplication($callback)
+    public function __construct(Config $appConfig, Config $entrypointConfig)
     {
-        $callback(new Puice());
-    }
-
-    /**
-     * This function will be automaticaly be called while
-     * interpreting this Class file.
-     *
-     * It should be obvious, but you should have allready defined the
-     * Environment variable PUICE_CONFIG before starting an Application
-     * that uses Puice
-     */
-    public static function init()
-    {
-        require_once $_SERVER['PUICE_CONFIG'];
-    }
-
-    /**
-     * Resets all previous defined configurations
-     */
-    public static function reset()
-    {
-        self::$_configurations = array();
+        $this->_appConfig = $appConfig;
+        $this->_entrypointConfig = $entrypointConfig;
+        $this->_factory = new Puice\Factory($this);
     }
 
     /**
@@ -73,30 +53,25 @@ class Puice implements Puice\Config
      *
      * @param string $type currently only ClassNames with Namespaces are
      *                     supported
-     * @param string $name name of the Dependency, which also should match
-     *                     the constructor name
+     * @param string $name (optional) name of the Dependency. Default is
+     *                     'default'
      *
      * @return mixed predefined Dependency
      */
-    public function get($type, $name)
+    public function get($type, $name = 'default')
     {
-        if (isset(self::$_configurations[$type])) {
-            if (isset(self::$_configurations[$type][$name])) {
-                return self::$_configurations[$type][$name];
-            } else
-            // if only one configuration exist autochoose
-            if (count(self::$_configurations[$type]) == 1) {
-                return array_pop(self::$_configurations[$type]);
-            }
+        if (null == ($dependency = $this->_entrypointConfig->get($type, $name))) {
+            $dependency = $this->_appConfig->get($type, $name);
         }
 
-        return null;
+        return $dependency;
     }
 
     /**
      * Sets a Dependency with the specified type, name and value.
-     * Please make sure, that you call this Method only in (the) config
-     * script(s).
+     * Please make sure, that you call this Method only in a config
+     * or even better use the locally defined $config Object like described
+     * in features/puice.feature
      *
      * @param string $type type of the Dependency. Currently only Class
      *                     names with Namespaces are supported
@@ -105,16 +80,21 @@ class Puice implements Puice\Config
      */
     public function set($type, $name, $value)
     {
-        if (!array_key_exists($type, self::$_configurations)) {
-            self::$_configurations[$type] = array();
-        }
-
-        if (array_key_exists($name, self::$_configurations[$type])) {
-            throw new Exception('Duplicate definition of one Dependency');
-        }
-
-        self::$_configurations[$type][$name] = $value;
+        $this->_appConfig->set($type, $name, $value);
     }
-}
 
-Puice::init();
+    /**
+     * This is the method doing the magic. You can create every Instance
+     * with it, as long as the Dependencies were allready defined.
+     *
+     * @param string $classType Type of the Dependency as $Namespace.$Classname
+     * @param string $name Name of the Dpenedency
+     *
+     * @throws \Exception if some required dependencies could not be found.
+     */
+    public function create($classType, $className = 'default')
+    {
+        return $this->_factory->create($classType, $className);
+    }
+
+}

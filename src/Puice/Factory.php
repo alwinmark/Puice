@@ -60,34 +60,35 @@ class Factory
      * This is the method doing the magic. You can create every Instance
      * with it, as long as the Dependencies were allready defined.
      *
-     * @param string $className $Namespace.$Classname
+     * @param string $classType Type of the Dependency as $Namespace.$Classname
+     * @param string $name Name of the Dpenedency
      *
      * @throws \Exception if some required dependencies could not be found.
      */
-    public function create($className)
+    public function create($classType, $className = 'default')
     {
-        $reflection = new \ReflectionClass($className);
+        $clazz = $this->getDependency($classType, $className, true);
+        $reflection = new \ReflectionClass($classType);
         $constructorReflection = $reflection->getConstructor();
 
         if ($constructorReflection == null) {
-            return new $className();
+            return new $classType();
         }
 
         $constructorParameters = $constructorReflection->getParameters();
         $arguments = array();
 
         foreach ($constructorParameters as $parameter) {
-            $systemType = null;
+            $type = null;
             $name = $parameter->name;
             $isOptional = $parameter->isOptional();
 
             if (! is_null($typeClass = @$parameter->getClass())) {
-                $systemType = $typeClass->name;
+                $type = $typeClass->name;
             } else {
-                $systemType = 'string';
+                $type = 'string';
             }
 
-            $type = $this->mapType($systemType);
             $arguments[] = $this->getDependency($type, $name, $isOptional);
         }
 
@@ -104,19 +105,22 @@ class Factory
             return $dependency;
         }
 
+        // if it is a concrete Class, its a try worth to instantiate it
+        if (class_exists($type)) {
+            return $this->create($type);
+        }
+
+        // and if that does not work, try the Default Prefix
+        $defaultDependency = preg_replace(
+            '/(.*\\\\)(\w+)/i', '\1\2\Default\2', $type
+        );
+
+        if (class_exists($defaultDependency)) {
+            return $this->create($defaultDependency);
+        }
+
         throw new \Exception(
             "Couldn't find Dependency for type: $type and name: $name"
         );
-    }
-
-    /**
-     * maps a SystemType to sth. else
-     * @param string systemType
-     *
-     * @return string type
-     */
-    protected function mapType($systemType)
-    {
-        return $systemType;
     }
 }

@@ -34,11 +34,12 @@ interface Config
      * As a Reference you may want to look at Puice.php.
      *
      * @param string $type currently [Namespace + Classname] or string
-     * @param string $name name of the Dependency
+     * @param string $name (optional) name of the Dependency. Default is
+     *                     'default'
      *
      * @param mixed Dependency itself
      */
-    public function get($type, $name);
+    public function get($type, $name = 'default');
 
     /**
      * Sets a Dependency for the given $name and $type
