@@ -7,6 +7,11 @@ Dependency and Configruation Management Framework inspired by Guice and these tw
  - http://www.youtube.com/watch?v=RlfLCWKxHJ0
  - http://www.youtube.com/watch?v=-FRm3VPhseI
 
+Benchmark
+---------
+
+https://github.com/CansaSCityShuffle/benchmarking-dependency-injection-containers (currently only Benchmark 1 is implemented)
+
 Install
 -------
 
@@ -17,7 +22,7 @@ For example:
 ```json
 {
     "require": {
-        "CansaSCityShuffle/Puice": "*"
+        "cansascityshuffle/puice": "0.3.0"
     },
     "require-dev": {
         "behat/behat": "2.4.*@stable",
