@@ -20,6 +20,7 @@ use Behat\Gherkin\Node\PyStringNode,
 class FeatureContext extends BehatContext
 {
     protected $cleanUpCallbacks = array();
+    protected $className = null;
 
     protected $injectTargetClass = null;
     protected $subject = null;
@@ -32,7 +33,9 @@ class FeatureContext extends BehatContext
      */
     public function __construct(array $parameters)
     {
-        // Initialize your context here
+        $timeStamp = intval(microtime(true) * 1000);
+        $this->className = "TestClass$timeStamp";
+
     }
 
     /**
@@ -64,14 +67,21 @@ class FeatureContext extends BehatContext
 
 
     /**
-     * @Given /^the Environment variable PUICE_CONFIG is set to \'([^\']*)\'$/
+     * @Given /^the Environment variable \'([^\']*)\' is set to \'([^\']*)\'$/
      */
-    public function theEnvironmentVariablePuiceConfigIsSetTo($configPath)
+    public function theEnvironmentVariablePuiceConfigIsSetTo($key, $configPath)
     {
-        $_SERVER['PUICE_CONFIG'] = $configPath;
-        $this->cleanUpCallbacks[] = function() {
-            Puice::resetApplicationConfig();
-        };
+        $key = \str_replace(
+            '%some_class%',
+            $this->className,
+            $key
+        );
+
+        $_SERVER[$key] = \str_replace(
+            '%some_class%',
+            $this->className,
+            $configPath
+        );
     }
 
     /**
@@ -79,16 +89,13 @@ class FeatureContext extends BehatContext
      */
     public function iHaveAClass(PyStringNode $string)
     {
-        $timeStamp = intval(microtime(true) * 1000);
-        $className = "TestClass$timeStamp";
         $classDefinition = \str_replace(
             '%some_class%',
-            $className,
+            $this->className,
             $string
         );
 
         eval($classDefinition);
-        $this->injectTargetClass = $className;
     }
 
     /**
@@ -96,7 +103,7 @@ class FeatureContext extends BehatContext
      */
     public function iCallCreateOnThisClass()
     {
-        $clazz = $this->injectTargetClass;
+        $clazz = $this->className;
         $this->subject = $clazz::create();
     }
 
@@ -109,20 +116,11 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @Given /^my class to inject is "([^"]*)"$/
+     * @Then /^I should get an Instance of \'([^\']*)\' for the Property \'([^\']*)\'$/
      */
-    public function myClassToInjectIs($className)
+    public function iShouldGetAnInstanceOfForTheProperty($expectedClass, $property)
     {
-        $this->injectTargetClass = $className;
-    }
-
-    /**
-     * @When /^build an Instance of this Class with the Factory$/
-     */
-    public function buildAnInstanceOfThisClassWithTheFactory()
-    {
-        $factory = new Puice\Factory(new Puice());
-        $this->subject = $factory->create($this->injectTargetClass);
+        assertEquals($expectedClass, get_class($this->subject->$property));
     }
 
     /**

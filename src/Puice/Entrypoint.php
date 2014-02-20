@@ -16,6 +16,7 @@ namespace Puice;
 
 use Puice;
 use Puice\Factory;
+use Puice\Config;
 
 /**
  * Little Helper Class, to easyfy the useage of Puice.
@@ -29,6 +30,7 @@ use Puice\Factory;
  */
 class Entrypoint
 {
+    protected $_puice = null;
 
     /**
      * will internally call the constructor of the implementing Class with
@@ -38,20 +40,88 @@ class Entrypoint
      */
     public static function create()
     {
-        include self::getServerConf();
         $clazz = get_called_class();
-        $factory = new Factory(new Puice());
-        return $factory->create($clazz);
+        $appConfig = $clazz::getConfigInstance();
+        $myConfig = $clazz::getConfigInstance();
+        $puice = new Puice($appConfig, $myConfig);
+
+        self::loadConfig($clazz::getAppConf(), $appConfig, $puice);
+        self::loadConfig($clazz::getMyConf(), $myConfig, $puice);
+
+        $object = $puice->create($clazz);
+        $object->setPuice($puice);
+
+        return $object;
     }
 
     /**
-     * Overwriteable Function to costom define the Root Application
+     * loadsConfigfile
+     * If the configPath == null nothing will be loaded
+     *
+     * @param $configPath           path to the required Configfile
+     * @param Puice\Config &$config reference to the Configuration Object
+     *                              that should be filled
+     * @param Puice $puice          Puice object, so its possible to create
+     *                              "singleton" Objects in the Config
+     */
+    private static function loadConfig(
+        $configPath, Config &$config, Puice $puice
+    ) {
+        if ($configPath != null) {
+            include $configPath;
+        }
+    }
+
+    /**
+     * Hookfunction to enable the usageo of Costum Implementations of
+     * Puice\Config
+     *
+     * @return Puice\Config
+     */
+    protected static function getConfigInstance()
+    {
+        return new Puice\Config\DefaultConfig();
+    }
+
+    /**
+     * Overwriteable Function to custom define the Root Application
      * Config file for Puice
+     *
+     * @see features/puice.feature
      *
      * @return string Path of the root Application Puice Configfile
      */
-    protected static function getServerConf()
+    protected static function getAppConf()
     {
-        return $_SERVER['PUICE_CONFIG'];
+        return $_SERVER['APP_CONFIG'];
+    }
+
+    /**
+     * Overwriteable Function to custom define the EntryPoint
+     * Config file for Puice
+     *
+     * @see features/puice.feature
+     *
+     * @return string Path of the Entrypoint Puice Configfile
+     */
+    protected static function getMyConf()
+    {
+        $className = str_replace('\\', '_', get_called_class());
+        $key = "{$className}_CONFIG";
+        if (array_key_exists($key, $_SERVER)) {
+            return $_SERVER[$key];
+        }
+
+        return null;
+    }
+
+    /**
+     * setter for Puice
+     *
+     * @param $factory
+     */
+    public function setPuice(Puice $puice)
+    {
+        $this->_puice = $puice;
     }
 }

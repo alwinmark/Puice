@@ -87,4 +87,31 @@ class DefaultConfig implements Config
         $this->_configurations[$type][$name] = $value;
     }
 
+    /**
+     * Bulk sets Dependencies for a given array with two levels:
+     * @example
+     *    array(
+     *      'Puice\Config' => array(
+     *        'appConfig' => new MyConfig()
+     *      )
+     *    );
+     *
+     * @param array $configs bulk of dependency definitions like the
+     *                       example above
+     */
+    public function bulkSet(array $configs)
+    {
+        foreach ($configs as $type => $typeConfigs) {
+            if (! is_array($typeConfigs)) {
+                throw new \InvalidArgumentException(
+                    "Given configs for type: $type, must be an array itself"
+                );
+            }
+
+            foreach ($typeConfigs as $name => $value) {
+                self::$_appConfig->set($type, $name, $value);
+            }
+        }
+    }
+
 }

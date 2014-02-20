@@ -27,44 +27,23 @@ use Puice\Config;
 class Puice implements Config
 {
 
-    private static $_appConfig = null;
+    private $_appConfig = null;
+    private $_entrypointConfig = null;
+    private $_factory = null;
+
 
     /**
-     * Static method used by the config.inc.php Files to set Dependencies
-     * outside of the implementation.
-     * @see
-     * https://github.com/CansaSCityShuffle/Puice/blob/master/features/puice.feature
-     * as an Example
+     * constructs the wonderfull Puice object with two levels of
+     * Configurations.
      *
-     * @param callable $callback callback which will be called with the
-     *                           Application Config Object.
-     *
+     * @param Puice\Config $appConfig application Level Dependencies
+     * @param Puice\Config $entrypointConfig entrypoint Level Dependencies
      */
-    public static function configureApplication($callback)
+    public function __construct(Config $appConfig, Config $entrypointConfig)
     {
-        self::init();
-        $callback(self::$_appConfig);
-    }
-
-    /**
-     * Initializes Puice
-     * This function initializes Puice, but is not mandatory as
-     * every function, that needs an initialized Puice already calls this
-     * function
-     */
-    public static function init()
-    {
-        if (self::$_appConfig == null) {
-            self::$_appConfig = new Puice\Config\DefaultConfig();
-        }
-    }
-
-    /**
-     * Resets all previous defined Application configurations
-     */
-    public static function resetApplicationConfig()
-    {
-        self::$_appConfig->reset();
+        $this->_appConfig = $appConfig;
+        $this->_entrypointConfig = $entrypointConfig;
+        $this->_factory = new Puice\Factory($this);
     }
 
     /**
@@ -81,11 +60,11 @@ class Puice implements Config
      */
     public function get($type, $name = 'default')
     {
-        if (self::$_appConfig == null) {
-            return null;
+        if (null == ($dependency = $this->_entrypointConfig->get($type, $name))) {
+            $dependency = $this->_appConfig->get($type, $name);
         }
 
-        return $dependency = self::$_appConfig->get($type, $name);
+        return $dependency;
     }
 
     /**
@@ -100,35 +79,21 @@ class Puice implements Config
      */
     public function set($type, $name, $value)
     {
-        self::init();
-
-        self::$_appConfig->set($type, $name, $value);
+        self::$_entrypointConfig->set($type, $name, $value);
     }
 
     /**
-     * Bulk sets Dependencies for a given array with two levels:
-     * @example
-     *    array(
-     *      'Puice\Config' => array(
-     *        'appConfig' => new MyConfig()
-     *      )
-     *    );
+     * This is the method doing the magic. You can create every Instance
+     * with it, as long as the Dependencies were allready defined.
      *
-     * @param array $configs bulk of dependency definitions like the
-     *                       example above
+     * @param string $classType Type of the Dependency as $Namespace.$Classname
+     * @param string $name Name of the Dpenedency
+     *
+     * @throws \Exception if some required dependencies could not be found.
      */
-    public function bulkSet(array $configs)
+    public function create($classType, $className = 'default')
     {
-        foreach ($configs as $type => $typeConfigs) {
-            if (! is_array($typeConfigs)) {
-                throw new \InvalidArgumentException(
-                    "Given configs for type: $type, must be an array itself"
-                );
-            }
-
-            foreach ($typeConfigs as $name => $value) {
-                self::$_appConfig->set($type, $name, $value);
-            }
-        }
+        return $this->_factory->create($classType, $className);
     }
+
 }

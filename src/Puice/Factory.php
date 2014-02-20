@@ -79,17 +79,16 @@ class Factory
         $arguments = array();
 
         foreach ($constructorParameters as $parameter) {
-            $systemType = null;
+            $type = null;
             $name = $parameter->name;
             $isOptional = $parameter->isOptional();
 
             if (! is_null($typeClass = @$parameter->getClass())) {
-                $systemType = $typeClass->name;
+                $type = $typeClass->name;
             } else {
-                $systemType = 'string';
+                $type = 'string';
             }
 
-            $type = $this->mapType($systemType);
             $arguments[] = $this->getDependency($type, $name, $isOptional);
         }
 
@@ -112,7 +111,10 @@ class Factory
         }
 
         // and if that does not work, try the Default Prefix
-        $defaultDependency = preg_replace('/(.*\\\\)(\w+)/i','\1\2\Default\2', $type);
+        $defaultDependency = preg_replace(
+            '/(.*\\\\)(\w+)/i', '\1\2\Default\2', $type
+        );
+
         if (class_exists($defaultDependency)) {
             return $this->create($defaultDependency);
         }
@@ -120,16 +122,5 @@ class Factory
         throw new \Exception(
             "Couldn't find Dependency for type: $type and name: $name"
         );
-    }
-
-    /**
-     * maps a SystemType to sth. else
-     * @param string systemType
-     *
-     * @return string type
-     */
-    protected function mapType($systemType)
-    {
-        return $systemType;
     }
 }
