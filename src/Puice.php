@@ -68,9 +68,10 @@ class Puice implements Config
     }
 
     /**
-     * Sets an EntryPoint Dependency with the specified type, name and value.
-     * Please make sure, that you call this Method only in (the) config
-     * script(s).
+     * Sets a Dependency with the specified type, name and value.
+     * Please make sure, that you call this Method only in a config
+     * or even better use the locally defined $config Object like described
+     * in features/puice.feature
      *
      * @param string $type type of the Dependency. Currently only Class
      *                     names with Namespaces are supported
@@ -79,7 +80,7 @@ class Puice implements Config
      */
     public function set($type, $name, $value)
     {
-        self::$_entrypointConfig->set($type, $name, $value);
+        $this->_appConfig->set($type, $name, $value);
     }
 
     /**
