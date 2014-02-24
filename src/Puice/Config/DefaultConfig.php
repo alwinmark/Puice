@@ -13,7 +13,7 @@
 
 namespace Puice\Config;
 
-use Puice\Config;
+use Puice\Container;
 
 /**
  * Default implmementation of Puice\Config
@@ -24,7 +24,7 @@ use Puice\Config;
  * @package    Puice
  * @copyright  Copyright (c) 2014 Alwin Mark
  */
-class DefaultConfig implements Config
+class DefaultConfig implements Container
 {
 
     private $_configurations = array();

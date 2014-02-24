@@ -14,6 +14,8 @@
 
 namespace Puice;
 
+use Puice\Config;
+
 /**
  * Config Interface used to Provide the generic Factory all needed
  * Dependencies to automagic create Objects.
@@ -26,19 +28,16 @@ namespace Puice;
  * @package    Puice
  * @copyright  Copyright (c) 2014 Alwin Mark
  */
-interface Config
+interface Container extends Config
 {
 
     /**
-     * Gets a Dependency for the given type and name.
-     * As a Reference you may want to look at Puice.php.
+     * Sets a Dependency for the given $name and $type
      *
-     * @param string $type currently [Namespace + Classname] or string
-     * @param string $name (optional) name of the Dependency. Default is
-     *                     'default'
-     *
-     * @param mixed Dependency itself
+     * @param string $type [Namespace + Classname] or string
+     * @param string $name Name of the Dependency
+     * @param mixed $value Dependency itself
      */
-    public function get($type, $name = 'default');
+    public function set($type, $name, $value);
 
 }

@@ -68,22 +68,6 @@ class Puice implements Config
     }
 
     /**
-     * Sets a Dependency with the specified type, name and value.
-     * Please make sure, that you call this Method only in a config
-     * or even better use the locally defined $config Object like described
-     * in features/puice.feature
-     *
-     * @param string $type type of the Dependency. Currently only Class
-     *                     names with Namespaces are supported
-     * @param string $name name of the Dependency
-     * @param mixed $value the Dependency itself
-     */
-    public function set($type, $name, $value)
-    {
-        $this->_appConfig->set($type, $name, $value);
-    }
-
-    /**
      * This is the method doing the magic. You can create every Instance
      * with it, as long as the Dependencies were allready defined.
      *

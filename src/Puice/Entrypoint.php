@@ -16,7 +16,7 @@ namespace Puice;
 
 use Puice;
 use Puice\Factory;
-use Puice\Config;
+use Puice\Container;
 
 /**
  * Little Helper Class, to easyfy the useage of Puice.
