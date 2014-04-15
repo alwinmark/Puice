@@ -22,7 +22,7 @@ For example:
 ```json
 {
     "require": {
-        "cansascityshuffle/puice": "0.3.0"
+        "cansascityshuffle/puice": "1.0.0"
     },
     "require-dev": {
         "behat/behat": "2.4.*@stable",
