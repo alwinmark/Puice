@@ -39,5 +39,4 @@ interface Container extends Config
      * @param mixed $value Dependency itself
      */
     public function set($type, $name, $value);
-
 }

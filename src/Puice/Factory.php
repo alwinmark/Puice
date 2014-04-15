@@ -67,8 +67,8 @@ class Factory
      */
     public function create($classType, $className = 'default')
     {
-        $clazz = $this->getDependency($classType, $className, true);
         $reflection = new \ReflectionClass($classType);
+
         $constructorReflection = $reflection->getConstructor();
 
         if ($constructorReflection == null) {
@@ -96,31 +96,105 @@ class Factory
     }
 
     /**
-     * actually asks the Config Object for the needed Dependencies
+     * use multiple fetching Strategies for Dependencies
      */
     private function getDependency($type, $name, $isOptional = false)
     {
-        $dependency = $this->_config->get($type, $name);
-        if ($dependency != null || $isOptional) {
+        $dependency = $this->getDependencyFromConfig($type, $name);
+
+        if (!is_null($dependency)) {
             return $dependency;
         }
 
-        // if it is a concrete Class, its a try worth to instantiate it
-        if (class_exists($type)) {
-            return $this->create($type);
+        $dependency = $this->getDependencyFromType($type);
+
+        if (!is_null($dependency)) {
+            return $dependency;
         }
 
-        // and if that does not work, try the Default Prefix
-        $defaultDependency = preg_replace(
-            '/(.*\\\\)(\w+)/i', '\1\2\Default\2', $type
-        );
+        $dependency = $this->getDefaultDependencyFromInterface($type);
 
-        if (class_exists($defaultDependency)) {
-            return $this->create($defaultDependency);
+        if (!is_null($dependency)) {
+            return $dependency;
+        }
+
+        $dependency = $this->getDependencyFromInterface($type);
+
+        if (!is_null($dependency)) {
+            return $dependency;
+        }
+
+        if ($isOptional) {
+            return null;
         }
 
         throw new \Exception(
             "Couldn't find Dependency for type: $type and name: $name"
         );
+    }
+
+    /**
+     * Just try to get an Instance from the known type
+     */
+    private function getDependencyFromType($type)
+    {
+        if (class_exists($type)) {
+            return $this->create($type, false);
+        }
+
+        return null;
+    }
+
+    /**
+     * Prepend Default to the class and try to find the class
+     */
+    private function getDefaultDependencyFromInterface($type)
+    {
+        $defaultDependency = preg_replace(
+            '/(.*\\\\)(\w+)/i', '\1\2\Default\2', $type
+        );
+
+        if (class_exists($defaultDependency)) {
+            return $this->create($defaultDependency, false);
+        }
+
+        return null;
+    }
+
+    /**
+     * remove Interface suffix or prefix (or middlefix) and try to find the
+     * class
+     */
+    private function getDependencyFromInterface($type)
+    {
+        $defaultDependency = preg_replace(
+            '/Interface/i', '', $type
+        );
+
+        if (class_exists($defaultDependency)) {
+            return $this->create($defaultDependency, false);
+        }
+
+        return null;
+    }
+
+    /**
+     * scan the config object for dependencies
+     */
+    private function getDependencyFromConfig($type, $name)
+    {
+        $dependency = $this->_config->get($type, $name);
+
+        if (is_object($dependency) || $type == 'string') {
+            return $dependency;
+        }
+
+        if ($type != "string" && is_string($dependency)
+                && class_exists($dependency)
+        ) {
+            return $this->create($dependency, false);
+        }
+
+        return null;
     }
 }

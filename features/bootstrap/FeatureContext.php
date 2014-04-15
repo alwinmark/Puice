@@ -24,6 +24,7 @@ class FeatureContext extends BehatContext
 
     protected $injectTargetClass = null;
     protected $subject = null;
+    protected $subject2 = null;
 
     /**
      * Initializes context.
@@ -131,4 +132,27 @@ class FeatureContext extends BehatContext
         assertEquals(true, $this->subject != null);
     }
 
+    /**
+     * @Given /^create another one$/
+     */
+    public function createAnotherOne()
+    {
+        $clazz = $this->className;
+        $this->subject2 = $clazz::create();
+    }
+
+    /**
+     * @Then /^both instances should (|not )have the same instance of \'([^\']*)\'$/
+     */
+    public function bothInstancesShouldHaveTheSameInstanceOf($not, $property) {
+        if (is_null($this->subject2)) {
+            $this->subject2 = $this->subject->other;
+        }
+
+        if ($not == "not ") {
+            assertEquals(true, $this->subject->$property !== $this->subject2->$property);
+        } else {
+            assertEquals(true, $this->subject->$property === $this->subject2->$property);
+        }
+    }
 }

@@ -24,6 +24,92 @@ Feature: Puice
         When I call create on this class
         Then I should get 'bar' for the Property 'foo'
 
+    Scenario: Shared Dependencies
+        Given the Environment variable 'APP_CONFIG' is set to '/tmp/puice_global_dependency.inc.php'
+        And there is a file '/tmp/puice_global_dependency.inc.php' with:
+            """
+            $config->set('Puice\Config', 'config',
+                $puice->create('Puice\Config\DefaultConfig')
+            );
+            """
+        And I have a Class:
+            """
+            class %some_class%2
+            {
+                public $config = null;
+
+                public function __construct(Puice\Config $config)
+                {
+                    $this->config = $config;
+                }
+            }
+            """
+        And I have a Class:
+            """
+            class %some_class% extends Puice\Entrypoint
+            {
+                public $config = null;
+                public $other= null;
+
+                public function __construct(Puice\Config $config,
+                        %some_class%2 $other)
+                {
+                    $this->config = $config;
+                    $this->other = $other;
+                }
+            }
+            """
+
+        When I call create on this class
+        Then both instances should have the same instance of 'config'
+
+
+    Scenario: Entrypoints do not share dependencies
+        Given the Environment variable 'APP_CONFIG' is set to '/tmp/puice_global_dependency.inc.php'
+        And there is a file '/tmp/puice_global_dependency.inc.php' with:
+            """
+            $config->set('Puice\Config', 'config', 'Puice\Config\DefaultConfig');
+            """
+        And I have a Class:
+            """
+            class %some_class% extends Puice\Entrypoint
+            {
+                public $config = null;
+
+                public function __construct(Puice\Config $config)
+                {
+                    $this->config = $config;
+                }
+            }
+            """
+        When I call create on this class
+        And create another one
+        Then both instances should not have the same instance of 'config'
+
+    Scenario: Create new Instance for every Dependency
+        Given the Environment variable 'APP_CONFIG' is set to '/tmp/puice_new_dependency.inc.php'
+        And there is a file '/tmp/puice_new_dependency.inc.php' with:
+            """
+            $config->set('Puice\Config', 'localConfig',
+                'Puice\Config\DefaultConfig'
+            );
+            """
+        And I have a Class:
+            """
+            class %some_class% extends Puice\Entrypoint
+            {
+                public $config = null;
+
+                public function __construct(Puice\Config $config)
+                {
+                    $this->config = $config;
+                }
+            }
+            """
+        When I call create on this class
+        And create another one
+        Then both instances should not have the same instance of 'config'
+
     Scenario: Puice injects itself, without a definition
         Given the Environment variable 'APP_CONFIG' is set to '/tmp/puice_factory_test.inc.php'
         And there is a file '/tmp/puice_factory_test.inc.php' with:

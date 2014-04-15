@@ -94,7 +94,7 @@ class FactorySpec extends ObjectBehavior
         $subject->factory->shouldHaveType('Puice\Factory');
     }
 
-    function it_autcreates_instance_if_dependency_has_a_DefaultImplementation(
+    function it_autocreates_instance_of_parameter_if_dependency_has_a_DefaultImplementation(
         Config $config
     ) {
         $className = 'Puice\Factory';
@@ -104,6 +104,39 @@ class FactorySpec extends ObjectBehavior
 
         $subject = $this->create($className);
         $subject->shouldHaveType($className);
+    }
+
+    function it_autocreates_instance_of_dependency_if_dependency_has_a_DefaultImplementation(
+        Config $config
+    ) {
+        $className = 'Puice\Config\DefaultConfig';
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
+    }
+
+
+    function it_autocreates_instance_of_dependency_if_dependency_has_a_DefaultImplementation_without_interface_suffix(
+        Config $config
+    ) {
+        $className = 'spec\Puice\DependencyWithSomeInterface';
+
+        $subject = $this->create($className);
+        $subject->shouldHaveType($className);
+    }
+
+}
+
+interface SomeInterface { }
+
+class Some implements SomeInterface { }
+
+class DependencyWithSomeInterface
+{
+
+    public function __construct(SomeInterface $some)
+    {
+
     }
 
 }
