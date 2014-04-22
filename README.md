@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/CansaSCityShuffle/Puice.png?branch=master)](https://travis-ci.org/CansaSCityShuffle/Puice)
+[![HHVM Status](http://hhvm.h4cc.de/badge/cansascityshuffle/puice.png)](http://hhvm.h4cc.de/package/cansascityshuffle/puice)
 
 Puice
 =====
