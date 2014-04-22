@@ -1,5 +1,6 @@
 {
     "name": "cansascityshuffle/puice",
+    "license": "MIT",
     "require": {
     },
     "require-dev": {
