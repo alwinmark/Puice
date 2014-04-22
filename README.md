@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/CansaSCityShuffle/Puice.png?branch=master)](https://travis-ci.org/CansaSCityShuffle/Puice)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/CansaSCityShuffle/Puice/badges/quality-score.png?s=657ed43434b91c44e677ae7aadbca01e6cd42643)](https://scrutinizer-ci.com/g/CansaSCityShuffle/Puice/)
 [![HHVM Status](http://hhvm.h4cc.de/badge/cansascityshuffle/puice.png)](http://hhvm.h4cc.de/package/cansascityshuffle/puice)
 
 Puice
