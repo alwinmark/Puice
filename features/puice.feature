@@ -186,8 +186,8 @@ Feature: Puice
         And there is a file '/tmp/puice_factory_test.inc.php' with:
             """
             """
-        Given the Environment variable 'MY_VERY_OWN_DEPS' is set to '/tmp/puice_entry_point_test.inc.php'
-        Given there is a file '/tmp/puice_entry_point_test.inc.php' with:
+        Given the Environment variable 'MY_VERY_OWN_DEPS' is set to '/tmp/my_entry_point_test.inc.php'
+        Given there is a file '/tmp/my_entry_point_test.inc.php' with:
             """
             $config->set('string', 'foo', 'envbar');
             """
@@ -204,6 +204,7 @@ Feature: Puice
 
                 public static function getMyConf()
                 {
+                    echo $_SERVER['MY_VERY_OWN_DEPS'];
                     return $_SERVER['MY_VERY_OWN_DEPS'];
                 }
             }
