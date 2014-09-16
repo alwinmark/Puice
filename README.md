@@ -19,6 +19,10 @@ https://github.com/CansaSCityShuffle/benchmarking-dependency-injection-container
 Install
 -------
 
+Install php5-curl
+
+* on debian/ubuntu: `sudo apt-get install php5-curl`
+
 To install Puice put this into your composer.json
 `"CansaSCityShuffle/Puice": "*"`
 
@@ -53,4 +57,4 @@ Maybe you have allready some Kind of Configuration/Injection Framework and you o
 Licence
 --------
 
-Free for all
+MIT
