@@ -204,7 +204,6 @@ Feature: Puice
 
                 public static function getMyConf()
                 {
-                    echo $_SERVER['MY_VERY_OWN_DEPS'];
                     return $_SERVER['MY_VERY_OWN_DEPS'];
                 }
             }
