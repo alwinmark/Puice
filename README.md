@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/CansaSCityShuffle/Puice.png?branch=master)](https://travis-ci.org/CansaSCityShuffle/Puice)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/CansaSCityShuffle/Puice/badges/quality-score.png?s=657ed43434b91c44e677ae7aadbca01e6cd42643)](https://scrutinizer-ci.com/g/CansaSCityShuffle/Puice/)
-[![HHVM Status](http://hhvm.h4cc.de/badge/cansascityshuffle/puice.png)](http://hhvm.h4cc.de/package/cansascityshuffle/puice)
-[![Latest Stable Version](https://poser.pugx.org/cansascityshuffle/puice/v/stable.png)](https://packagist.org/packages/cansascityshuffle/puice)
-[![License](https://poser.pugx.org/cansascityshuffle/puice/license.png)](https://packagist.org/packages/cansascityshuffle/puice)
+[![Build Status](https://travis-ci.org/alwinmark/Puice.png?branch=master)](https://travis-ci.org/CansaSCityShuffle/Puice)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alwinmark/Puice/badges/quality-score.png?s=657ed43434b91c44e677ae7aadbca01e6cd42643)](https://scrutinizer-ci.com/g/CansaSCityShuffle/Puice/)
+[![HHVM Status](http://hhvm.h4cc.de/badge/alwinmark/puice.png)](http://hhvm.h4cc.de/package/cansascityshuffle/puice)
+[![Latest Stable Version](https://poser.pugx.org/alwinmark/puice/v/stable.png)](https://packagist.org/packages/cansascityshuffle/puice)
+[![License](https://poser.pugx.org/alwinmark/puice/license.png)](https://packagist.org/packages/cansascityshuffle/puice)
 
 Puice
 =====
@@ -14,7 +14,7 @@ Dependency and Configruation Management Framework inspired by Guice and these tw
 Benchmark
 ---------
 
-https://github.com/CansaSCityShuffle/benchmarking-dependency-injection-containers (currently only Benchmark 1 is implemented)
+https://github.com/alwinmark/benchmarking-dependency-injection-containers (currently only Benchmark 1 is implemented)
 
 Install
 -------
@@ -30,7 +30,7 @@ For example:
 ```json
 {
     "require": {
-        "cansascityshuffle/puice": "1.0.0"
+        "alwinmark/puice": "1.0.0"
     },
     "require-dev": {
         "behat/behat": "2.4.*@stable",
