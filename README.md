@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/alwinmark/Puice.png?branch=master)](https://travis-ci.org/CansaSCityShuffle/Puice)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alwinmark/Puice/badges/quality-score.png?s=657ed43434b91c44e677ae7aadbca01e6cd42643)](https://scrutinizer-ci.com/g/CansaSCityShuffle/Puice/)
-[![HHVM Status](http://hhvm.h4cc.de/badge/alwinmark/puice.png)](http://hhvm.h4cc.de/package/cansascityshuffle/puice)
-[![Latest Stable Version](https://poser.pugx.org/alwinmark/puice/v/stable.png)](https://packagist.org/packages/cansascityshuffle/puice)
-[![License](https://poser.pugx.org/alwinmark/puice/license.png)](https://packagist.org/packages/cansascityshuffle/puice)
+[![Build Status](https://travis-ci.org/alwinmark/Puice.png?branch=master)](https://travis-ci.org/alwinmark/Puice)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alwinmark/Puice/badges/quality-score.png?s=657ed43434b91c44e677ae7aadbca01e6cd42643)](https://scrutinizer-ci.com/g/alwinmark/Puice/)
+[![HHVM Status](http://hhvm.h4cc.de/badge/alwinmark/puice.png)](http://hhvm.h4cc.de/package/alwinmark/puice)
+[![Latest Stable Version](https://poser.pugx.org/alwinmark/puice/v/stable.png)](https://packagist.org/packages/alwinmark/puice)
+[![License](https://poser.pugx.org/alwinmark/puice/license.png)](https://packagist.org/packages/alwinmark/puice)
 
 Puice
 =====
@@ -24,7 +24,7 @@ Install php5-curl
 * on debian/ubuntu: `sudo apt-get install php5-curl`
 
 To install Puice put this into your composer.json
-`"CansaSCityShuffle/Puice": "*"`
+`"alwinmark/Puice": "*"`
 
 For example: 
 ```json
